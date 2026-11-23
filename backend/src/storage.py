@@ -20,6 +20,10 @@ class Register:
         self.cursor.execute(sql, args)
         return self.cursor.lastrowid
 
+    def change(self, sql, args=()):
+        self.cursor.execute(sql, args)
+        return self.cursor.rowcount
+
     def rows(self, sql, args=()):
         self.execute(sql, args)
         rows = self.cursor.fetchall()

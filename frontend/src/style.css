@@ -97,7 +97,7 @@ tr.selected { background: oklch(94% .049 122); }
 .badge { display: inline-flex; align-items: center; gap: 5px; background: oklch(93% .028 151); color: oklch(38% .069 154); font-size: 10px; font-weight: 750; padding: 3px 7px; white-space: nowrap; }
 .badge i { display: inline-block; background: currentColor; width: 5px; height: 5px; border-radius: 50%; }
 .badge.migrating,.badge.paused,.badge.followup,.badge.failed { background: var(--warm); color: var(--rust); }
-.badge.queued,.badge.retesting,.badge.obsolete { background: var(--paper); color: var(--muted); }
+.badge.queued,.badge.retesting,.badge.obsolete,.badge.cancelled { background: var(--paper); color: var(--muted); }
 .dark-pane { background: var(--forest); border-color: var(--forest); color: var(--sheet); }.dark-pane .pane-head p { color: oklch(79% .044 146); }
 .dark-pane .detail-key { display: flex; align-items: center; gap: 9px; }.dark-pane .detail-key .code { color: var(--leaf); }
 .dark-pane .facts { display: grid; gap: 9px; margin: 16px 0; padding: 14px 0; border-block: 1px solid oklch(45% .040 152); }

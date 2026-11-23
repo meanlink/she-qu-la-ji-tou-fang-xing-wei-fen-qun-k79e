@@ -20,14 +20,23 @@ export function qualityPage() {
 }
 
 export function overflowPage() {
-  const status = {requested: '待调度', scheduled: '待清运确认', resolved: '已确认清运'};
+  const status = {requested: '待调度', scheduled: '待清运确认', resolved: '已确认清运', cancelled: '已撤单'};
   const rows = rowSet(state.overflowDispatch, row => {
     let action = '';
     if (!row.state && state.staff.role !== 'viewer') action = form('request-overflow', row, '申请清运', '说明满溢位置及现场影响');
-    if (row.state === 'requested' && state.staff.role === 'admin') action = form('schedule-overflow', row, '安排清运', '登记执行班组和交接要求');
+    if (row.state === 'requested' && state.staff.role === 'admin' && row.point_revision === row.current_revision) {
+      action = form('schedule-overflow', row, '安排清运', '登记执行班组和交接要求');
+    }
     if (row.state === 'scheduled' && state.staff.role !== 'viewer') action = form('resolve-overflow', row, '确认清运结果', '记录清运完成时间和桶点现状');
-    return `<tr><td><strong>${text(row.name)}</strong><br>${text(row.sample_day)} · ${labelSlot(row.slot)}</td><td>${row.overflow} / ${row.total} · ${pct(row.overflow / row.total)}</td>
-      <td>${badge(status[row.state] || '达到清运线')}<br>${log([row.note, row.schedule_note, row.outcome])}</td><td>${action}</td></tr>`;
-  }, 4, '暂无达到临时清运门槛的窗口。');
-  return `<section class="pane">${paneHead('满溢清运调度台账', '在册地址的有效窗口至少记录 3 次满溢且达到 15%，方可申请清运。')}${table(['采样点位', '满溢记录', '工单进度', '业务操作'], rows)}</section>`;
+    // Tickets keep the address they were raised against, so a new-site ticket is never read as old-site work.
+    const address = row.work_location ?? (row.state ? '旧址地址未记录' : row.current_location);
+    const atOldSite = row.state && row.point_revision !== row.current_revision;
+    const line = [row.note, row.schedule_note, row.outcome];
+    if (row.cancel_reason) line.push(`撤单：${row.cancel_reason}${row.cancelled_at ? `（${text(row.cancelled_by)}）` : ''}`);
+    return `<tr><td><strong>${text(row.name)}</strong><br>${text(row.sample_day)} · ${labelSlot(row.slot)}</td>
+      <td>${row.overflow} / ${row.total} · ${pct(row.overflow / row.total)}</td>
+      <td>${text(address)}<br><small>地址 V${row.point_revision}${atOldSite ? ' · 旧址' : ''}${row.work_location && row.current_location && row.work_location !== row.current_location ? ' · 与现址不同' : ''}</small></td>
+      <td>${badge(status[row.state] || '达到清运线')}<br>${log(line)}</td><td>${action || (row.state === 'cancelled' ? '<small>无需安排</small>' : '')}</td></tr>`;
+  }, 5, '暂无达到临时清运门槛的窗口。');
+  return `<section class="pane">${paneHead('满溢清运调度台账', '在册地址的有效窗口至少记录 3 次满溢且达到 15%，方可申请清运。工单保留申请时的作业地址；迁址后未调度工单撤销，已调度工单仍按旧址收回执。')}${table(['采样点位', '满溢记录', '实际作业地址', '工单进度', '业务操作'], rows)}</section>`;
 }

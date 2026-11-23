@@ -16,7 +16,7 @@ const pages = {
   points: {title: '点位档案', description: '维护社区投放点的使用地址，防止旧址样本与新址串用。', render: pointsPage},
   windows: {title: '投放采样', description: '按点位、日期和时段汇总匿名观察，供基线分析和宣教复测使用。', render: windowsPage},
   quality: {title: '采样复核', description: '处理现场计数争议，确定可用于分群的匿名采样。', render: qualityPage},
-  overflow: {title: '满溢清运', description: '按有效采样安排清运，登记执行和现场结果。', render: overflowPage},
+  overflow: {title: '满溢清运', description: '按有效采样安排清运，工单保留申请时的作业地址与撤单原因。', render: overflowPage},
   groups: {title: '行为分群', description: '比较在册点位的投放表现，由社区运营复核群组和宣教建议。', render: groupsPage},
   conditions: {title: '现场条件', description: '核实伴随采样的现场事实，为复测和群组整改保留上下文。', render: conditionsPage, load: api.conditions},
   appointments: {title: '复测排班', description: '为宣教任务预留同址、同时段的两个观察班次。', render: appointmentsPage, load: api.appointments},

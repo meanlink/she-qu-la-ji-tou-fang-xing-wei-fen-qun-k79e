@@ -3,6 +3,7 @@ from datetime import timedelta
 from fastapi import HTTPException
 
 from src.contracts import TaskState, local_day
+from src.dispatch_lifecycle import cancel_for_relocation
 from src.storage import register
 from src.window_reservations import reserve_window
 
@@ -53,6 +54,9 @@ def resolve_move(point_id, form, actor, approve):
             raise HTTPException(409, '当前点位没有待核迁移')
         facts = {'old_location': point['location'], 'proposed_location': point['pending_location'], 'note': form.note}
         if approve:
+            # Same transaction as the address change: a failed confirmation leaves both the
+            # address version and the dispatch states untouched, so a retry cannot double-cancel.
+            facts.update(cancel_for_relocation(ledger, point, actor))
             sample_from = local_day() + timedelta(days=1)
             ledger.execute('''UPDATE disposal_points SET location=pending_location,revision=revision+1,
                 sample_from=%s WHERE id=%s''', (sample_from, point_id))
